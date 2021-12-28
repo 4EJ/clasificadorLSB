@@ -1,12 +1,13 @@
 import cv2
-import matplotlib.pyplot as plt
 import time
+import os
 
 class VideoCapture:
 
     def __init__(self, video_source = 0):
-        self.video_source = video_source
-        self.capturer = cv2.VideoCapture(video_source)
+        self.__detect_connected_webcams()
+        self.video_source = self.video_sources[0]
+        self.set_video_source(self.video_source)
         self.recording = True
         self.time_sleep = 0
         if not self.capturer.isOpened():
@@ -29,20 +30,33 @@ class VideoCapture:
 
         self.width, self.height = res
 
+        
+    def set_video_source(self, video_source):
+        self.video_source = video_source
+        self.capturer = cv2.VideoCapture(self.video_source)
+        
 
-    # To get frames
+    def get_video_sources(self):
+        return self.video_sources
+
+    def __detect_connected_webcams(self):
+        self.video_sources = []
+        for i in range(8):
+            cap = cv2.VideoCapture(i)
+            if not (cap is None or not cap.isOpened()):
+                self.video_sources.append(i)
+
     def get_frame(self):
         if self.recording:
             if self.capturer.isOpened():
                 ret, frame = self.capturer.read()
                 if ret:
-                    # Return a boolean success flag and the current frame converted to BGR
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     return (ret, frame)
                 else:
                     return (ret, None)
             else:
-                return (ret, None)
+                return (None, None)
         else:
             ret, frame = self.capturer.read()
             time.sleep(self.time_sleep)
@@ -54,7 +68,6 @@ class VideoCapture:
                 self.capturer = cv2.VideoCapture(self.video_source)
                 return (ret, None)
 
-    # Release the video source when the object is destroyed
     def __del__(self):
         if self.capturer.isOpened():
             self.capturer.release()
@@ -66,5 +79,30 @@ class VideoCapture:
         tot_frames = int(self.capturer.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = tot_frames / 3.0
         self.time_sleep = 1.0 / fps
-        print('fps', fps, 'time_sleep', self.time_sleep)
+    
+    def save_video(self, path_root, frames, sign):
+        if not os.path.isdir(path_root):
+            os.mkdir(path_root)
+        full_path = path_root + '/' + sign
         
+        if not os.path.isdir(full_path):
+            os.mkdir(full_path)
+        list_videos = os.listdir(full_path)
+        index = 1 + self.__count_files(list_videos)
+
+        path_video = full_path + '/' + sign + '_' + str(index) + '.avi'
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        
+        out = cv2.VideoWriter(path_video, fourcc, 15, (640, 480))
+
+        for frame in frames:
+            out.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+
+
+    def __count_files(self, folder):
+        ext = '.avi'
+        cnt = 0
+        for x in folder:
+            if ext in x:
+                cnt = cnt + 1
+        return cnt

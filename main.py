@@ -4,16 +4,10 @@ from app import App
 import tkinter as tk
 
 def main():
-    video_source = 1
+    video_source = 0
     video = VideoCapture(video_source)
-    
-    #path_model = '3dcnn_17/model_3dcnn_17_64.h5'
-    path_model = 'model_gray_3dcnn_6_96.h5'
-    
-    classifier = VideoClassifierLSB(path_model)
-    
+    classifier = VideoClassifierLSB()
     title = 'CLASIFICADOR DE VIDEOS DE LA LENGUA DE SEÑAS BOLIVIANA'
-    
     window = tk.Tk()
     app = App(window, title, video, classifier)
 
