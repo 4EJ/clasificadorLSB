@@ -52,6 +52,7 @@ class TrainingClassifier(threading.Thread):
           'path_data': self.sink
         }
 
+        
         training_generator = DataGenerator(self.X_train, self.labels, **params)
         dev_generator = DataGenerator(self.X_dev, self.labels, **params)
         
