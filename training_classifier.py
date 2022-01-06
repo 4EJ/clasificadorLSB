@@ -37,6 +37,8 @@ class TrainingClassifier(threading.Thread):
         self.X_train = None
         self.X_dev = None
     
+    
+
     def run(self):
         self.training_model_gui.update_label_epochs_training('Generando conjunto de entrenamiento en: ' + self.sink)
         self.generate_dataset()

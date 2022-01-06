@@ -73,6 +73,7 @@ class TrainingModelGUI(tk.Frame):
         self.model_path = None
 
     def generate_graphics(self, accuracy_epoch):
+        plt.figure(1).clear()
         fig = plt.figure(1)
         self.canvas = FigureCanvasTkAgg(fig, master=self.frame_graphics)
         self.plot_widget = self.canvas.get_tk_widget()
